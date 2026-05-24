@@ -1,0 +1,67 @@
+.scraper-form-card h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.scraper-form {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.scraper-form input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-card);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.scraper-form input::placeholder { color: var(--text-secondary); }
+
+.scraper-form input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.scraper-form button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--accent), #6344e0);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-family: var(--font);
+  white-space: nowrap;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity var(--transition), transform var(--transition);
+}
+
+.scraper-form button:hover { opacity: 0.88; transform: translateY(-1px); }
+.scraper-form button:active { transform: translateY(0); }
+.scraper-form button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* Spinner */
+.btn-loader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 520px) {
+  .scraper-form { flex-direction: column; }
+}

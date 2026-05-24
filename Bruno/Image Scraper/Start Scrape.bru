@@ -1,0 +1,21 @@
+meta {
+  name: Start Scrape
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3001/api/scrape
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "url": "https://www.ralphlauren.eu/lt/en/women/explore/polo-trans/9030156"
+  }
+}
+
+vars:post-res {
+  taskId: res.body.taskId
+}

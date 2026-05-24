@@ -1,0 +1,15 @@
+meta {
+  name: Get Task Status
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:3001/api/tasks/{{taskId}}
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  ~taskId: 
+}

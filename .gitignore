@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+.idea/
+scraped_images/
+ralph_images/
+ralph_images - Copy/
+image_scraper - Copy.py
+*.log
+package-lock.json
