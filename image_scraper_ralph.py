@@ -1,29 +1,23 @@
-#!/usr/bin/env python3
 """
-advanced_image_scraper.py
+image_scraper_ralph.py
 
-A robust image scraper for modern ecommerce / JS-heavy websites.
+A sophisticated image scraper designed for modern, JavaScript-heavy e-commerce websites.
+Specifically optimized for handling lazy-loading, anti-bot protections, and high-resolution 
+image retrieval through browser-level response interception.
 
-Features:
-- Playwright-powered rendering
-- Intercepts REAL browser image responses
-- Works with lazy-loaded images
-- Handles anti-bot protected sites better
-- Saves images directly from browser responses
-- Supports WebP / AVIF / JPEG / PNG
-- Optional auto-scroll
-- High-resolution image URL rewriting
-- Cookie banner handling
+Dependencies:
+    - playwright: Core engine for browser automation and network interception.
+    - Standard Library: argparse, hashlib, mimetypes, os, re, time, urllib, pathlib.
 
-Install:
-    pip install playwright beautifulsoup4 requests
+Installation:
+    pip install playwright
     playwright install chromium
 
 Usage:
-    python advanced_image_scraper.py <url>
+    python image_scraper_ralph.py <url> [options]
 
 Example:
-    python advanced_image_scraper.py "https://www.ralphlauren.eu/lt/en/women/explore/polo-trans/9030156"
+    python image_scraper_ralph.py "https://www.example.com/product" -o ./images --headed
 """
 
 import argparse
@@ -62,7 +56,14 @@ DEFAULT_HEADERS = {
 
 def safe_filename(url: str, content_type: str = "") -> str:
     """
-    Generate safe unique filename.
+    Generates a safe, unique filename based on the URL and content type.
+
+    Args:
+        url (str): The source URL of the image.
+        content_type (str): The MIME type of the image (e.g., 'image/jpeg').
+
+    Returns:
+        str: A sanitized filename string.
     """
     parsed = urllib.parse.urlparse(url)
 
@@ -87,7 +88,14 @@ def safe_filename(url: str, content_type: str = "") -> str:
 
 def upgrade_image_url(url: str) -> str:
     """
-    Attempt to upgrade ecommerce CDN image sizes.
+    Attempts to upgrade image URLs to their highest resolution versions 
+    by modifying common CDN query parameters (wid, hei, size).
+
+    Args:
+        url (str): The original image URL.
+
+    Returns:
+        str: The potentially upgraded image URL.
     """
 
     replacements = {
@@ -104,7 +112,14 @@ def upgrade_image_url(url: str) -> str:
 
 def ensure_unique_path(filepath: Path) -> Path:
     """
-    Avoid overwriting files.
+    Prevents file overwriting by appending a numeric counter to the filename 
+    if a file already exists at the specified path.
+
+    Args:
+        filepath (Path): The desired destination path.
+
+    Returns:
+        Path: A unique file path.
     """
 
     if not filepath.exists():
@@ -136,7 +151,15 @@ def scrape_images(
     headless: bool = True,
 ):
     """
-    Scrape images from webpage.
+    Navigates to a URL, interacts with the page, and intercepts image responses 
+    to save them to a local directory.
+
+    Args:
+        url (str): The target webpage URL.
+        output_dir (str): Directory where images will be saved.
+        scroll (bool): Whether to automatically scroll down to trigger lazy-loading.
+        min_size (int): Minimum file size in bytes for an image to be saved.
+        headless (bool): Whether to run the browser in headless mode.
     """
 
     output_path = Path(output_dir)
@@ -356,6 +379,9 @@ def scrape_images(
 # -----------------------------------------------------------------------------
 
 def main():
+    """
+    Parses command-line arguments and initiates the image scraping process.
+    """
 
     parser = argparse.ArgumentParser(
         description="Advanced JS-heavy website image scraper"

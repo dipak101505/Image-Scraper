@@ -118,51 +118,65 @@ async function scrapeImages(taskId, url, outputDir, onProgress) {
     });
 
     try {
-        await page.goto(url, { waitUntil: 'networkidle', timeout: 120000 });
+        // Use 'domcontentloaded' instead of 'networkidle' to avoid timeouts on busy sites
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+        
+        // Wait for a bit to let initial scripts run
         await page.waitForTimeout(5000);
 
-        // Cookie banners
+        // Cookie banners - try to clear them to uncover images
         const cookieSelectors = [
             "#onetrust-accept-btn-handler",
             "button:has-text('Accept All')",
             "button:has-text('Accept')",
             ".accept-all",
             ".cookie-accept",
+            "#close-pc-btn-handler", // OneTrust close
         ];
 
         for (const selector of cookieSelectors) {
             try {
                 const locator = page.locator(selector);
-                if (await locator.isVisible({ timeout: 2000 })) {
+                if (await locator.isVisible({ timeout: 3000 })) {
                     await locator.click();
+                    console.log(`[INFO] Clicked cookie banner: ${selector}`);
                     await page.waitForTimeout(2000);
-                    break;
                 }
             } catch (e) {}
         }
 
-        // Scroll
-        for (let i = 0; i < 25; i++) {
-            const previousHeight = await page.evaluate(() => document.body.scrollHeight);
-            await page.mouse.wheel(0, 3000);
-            await page.waitForTimeout(1500);
-            const currentHeight = await page.evaluate(() => document.body.scrollHeight);
-            if (currentHeight === previousHeight) break;
+        // Scroll more aggressively to trigger lazy-loading
+        console.log("[INFO] Scrolling to trigger lazy-loads...");
+        for (let i = 0; i < 15; i++) {
+            await page.mouse.wheel(0, 2000);
+            await page.waitForTimeout(1000);
+            
+            // Periodically check if we've reached the bottom
+            const isBottom = await page.evaluate(() => {
+                return (window.innerHeight + window.scrollY) >= document.body.scrollHeight - 100;
+            });
+            if (isBottom && i > 5) break;
         }
 
-        await page.waitForTimeout(8000);
+        // Give extra time for images to resolve after scrolling
+        await page.waitForTimeout(5000);
 
-        // Force images into view
+        // Force images into view by iterating all img tags
         const images = page.locator('img');
         const count = await images.count();
-        for (let i = 0; i < Math.min(count, 100); i++) {
+        console.log(`[INFO] Found ${count} img tags, forcing visibility...`);
+        for (let i = 0; i < Math.min(count, 50); i++) {
             try {
-                await images.nth(i).scrollIntoViewIfNeeded();
-                await page.waitForTimeout(100);
+                await images.nth(i).scrollIntoViewIfNeeded({ timeout: 1000 });
+                // Small random delay to seem more human
+                await page.waitForTimeout(200 + Math.random() * 300);
             } catch (e) {}
         }
 
-        await page.waitForTimeout(5000);
+        // Final wait for network requests to finish
+        await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {
+            console.log("[INFO] Network did not go idle, proceeding anyway...");
+        });
 
     } catch (e) {
         console.error(`Scrape task ${taskId} failed:`, e);
