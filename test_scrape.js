@@ -1,6 +1,6 @@
 async function test() {
     try {
-        const url = 'https://www.ralphlauren.eu/lt/en/women/explore/polo-trans/9030156';
+        const url = 'https://www.gucci.com/pl/en_gb/pr/women/ready-to-wear-for-women/skirts-for-women/printed-silk-midi-skirt-p-865115ZAVJR7313';
         console.log(`Starting scrape for ${url}...`);
         const startRes = await fetch('http://localhost:3001/api/scrape', {
             method: 'POST',

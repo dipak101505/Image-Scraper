@@ -57,11 +57,12 @@ async function scrapeImages(taskId, url, outputDir, onProgress) {
     const results = [];
 
     const browser = await chromium.launch({
-        headless: true,
+        headless: false,
         args: [
             "--disable-blink-features=AutomationControlled",
             "--disable-web-security",
             "--disable-features=IsolateOrigins,site-per-process",
+            "--disable-http2",
         ]
     });
 
@@ -118,8 +119,12 @@ async function scrapeImages(taskId, url, outputDir, onProgress) {
     });
 
     try {
-        // Use 'domcontentloaded' instead of 'networkidle' to avoid timeouts on busy sites
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+        try {
+            // Use 'domcontentloaded' instead of 'networkidle' to avoid timeouts on busy sites
+            await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+        } catch (navErr) {
+            console.log(`[WARN] Navigation warning: ${navErr.message}`);
+        }
         
         // Wait for a bit to let initial scripts run
         await page.waitForTimeout(5000);

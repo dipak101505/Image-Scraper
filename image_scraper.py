@@ -159,6 +159,7 @@ def scrape_images(
                 "--disable-blink-features=AutomationControlled",
                 "--disable-web-security",
                 "--disable-features=IsolateOrigins,site-per-process",
+                "--disable-http2",
             ]
         )
 
