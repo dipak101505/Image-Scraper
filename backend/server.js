@@ -82,7 +82,9 @@ app.get('/api/tasks/:id', (req, res) => {
     res.json(task);
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+const HOST = '0.0.0.0';
+
+app.listen(PORT, HOST, () => {
+    console.log(`Server running on http://${HOST}:${PORT}`);
     console.log(`Images served from: ${SCRAPED_IMAGES_DIR}`);
 });
